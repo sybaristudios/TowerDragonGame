@@ -4,10 +4,13 @@
     <Config>Configs\Default</Config>
   </Configs>
   <datafiles number="3" name="datafiles"/>
-  <NewExtensions/>
+  <NewExtensions>
+    <extension index="0">extensions\Swipe Controls</extension>
+  </NewExtensions>
   <sounds name="sound"/>
   <sprites name="sprites">
     <sprite>sprites\spr_checker</sprite>
+    <sprite>sprites\spr_checker_hero</sprite>
     <sprite>sprites\spr_solid</sprite>
     <sprites name="Hero">
       <sprite>sprites\spr_hero_walk</sprite>
@@ -21,14 +24,27 @@
       <sprite>sprites\spr_knight_walk</sprite>
       <sprite>sprites\spr_knight_mask</sprite>
     </sprites>
+    <sprites name="SwipeSprites">
+      <sprite>sprites\spr_eightWay</sprite>
+      <sprite>sprites\spr_purple</sprite>
+      <sprite>sprites\spr_fourWay</sprite>
+    </sprites>
+    <sprites name="GUI">
+      <sprite>sprites\spr_exit</sprite>
+      <sprite>sprites\spr_restart</sprite>
+    </sprites>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
   <scripts name="scripts">
     <script>scripts\scr_fall.gml</script>
     <script>scripts\scr_kill_hero.gml</script>
+    <script>scripts\point_bounds.gml</script>
+    <script>scripts\scr_process_swipe_input.gml</script>
+    <script>scripts\scr_process_swipe_input_AF.gml</script>
   </scripts>
   <objects name="objects">
+    <object>objects\obj_manager</object>
     <object>objects\obj_solid</object>
     <object>objects\obj_dragon</object>
     <objects name="Hero">
@@ -38,10 +54,21 @@
     </objects>
     <object>objects\obj_knight</object>
     <object>objects\obj_AI_turn_points</object>
+    <object>objects\obj_Hero_Turn_point</object>
     <object>objects\obj_enemy</object>
+    <objects name="SwipeObjects">
+      <object>objects\obj_swipeAnyway</object>
+      <object>objects\obj_swipeEight</object>
+      <object>objects\obj_swipeFour</object>
+    </objects>
+    <objects name="GUI">
+      <object>objects\obj_exit_button</object>
+      <object>objects\obj_restart_button</object>
+    </objects>
   </objects>
   <rooms name="rooms">
     <room>rooms\test_room</room>
+    <room>rooms\rm_swipe</room>
   </rooms>
   <help>
     <rtf>help.rtf</rtf>

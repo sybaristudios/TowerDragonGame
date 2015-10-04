@@ -25,17 +25,79 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Initialize variables
-
+            <string>///Settings
 grav = 1;
 
-moveSpeed = 4;
+maxMoveSpeed = 4;
+minMoveSpeed = 1;
+
+moveSpeed = minMoveSpeed;
 
 jSpeed = 12;
-hSpeed = 0;
 
+//Input 
+swipeMinLength = 50;
+
+swipeMaxLength = 100;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Initialize variables
+hSpeed = 0;
 vSpeed = 0;
 attacking = false;
+
+//Input
+inputDirectional = 1;
+jumpInput = false;
+attackInput = false;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Set up important stuffs
+
+//These variables indicate the position where the user started touching the screen
+initX = 0;
+initY = 0;
+
+//This indicated whether or not the user is touching the screen
+isTouching = 0;
+
+
 </string>
           </argument>
         </arguments>
@@ -58,12 +120,49 @@ attacking = false;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Get keyboard Input
+            <string>///Swipe handling (AF)
+var swipeLength = 0;
 
-inputLeft = keyboard_check(vk_left);
-inputRight = keyboard_check(vk_right);
-jumpInput = keyboard_check_pressed(vk_up);
-attackInput = keyboard_check_pressed(vk_space);
+if (mouse_check_button_pressed(mb_left))
+{
+    initX = mouse_x;
+    initY = mouse_y;
+    isTouching = 1;
+}
+
+if (isTouching)
+{
+    swipeLength = point_distance(initX, initY, mouse_x, mouse_y);
+    direction = point_direction(initX, initY, mouse_x, mouse_y);
+    
+    finalX = initX + lengthdir_x(min(swipeMaxLength, swipeLength), direction);
+    finalY = initY + lengthdir_y(min(swipeMaxLength, swipeLength), direction);
+    
+    var lerpFactor = swipeLength / swipeMaxLength;
+    
+    moveSpeed = lerp(moveSpeed, maxMoveSpeed, lerpFactor);
+    
+    moveSpeed = clamp(moveSpeed, minMoveSpeed, maxMoveSpeed);
+    
+      
+    show_debug_message(moveSpeed);
+}
+
+//Once the user stops touching the screen...
+if (mouse_check_button_released(mb_left))
+{
+    isTouching = 0;
+   
+    
+    if (swipeLength &lt; swipeMinLength)
+    {
+    //    scr_process_swipe_input(); 
+    attackInput = true;   
+    }
+   
+
+}
+
 </string>
           </argument>
         </arguments>
@@ -85,27 +184,19 @@ attackInput = keyboard_check_pressed(vk_space);
           <argument>
             <kind>1</kind>
             <string>///Platform controller
-move = (inputRight || inputLeft) &amp;&amp; !(inputRight &amp;&amp; inputLeft);
-idle = (!inputRight &amp;&amp; !inputLeft) || (inputRight &amp;&amp; inputLeft);
+move = inputDirectional != 0;
 
-moveDir = 0;
+hSpeed = moveSpeed * inputDirectional;
 
-if (inputRight)
-{
-    moveDir = 1;
-}
+show_debug_message("moveSpeed: ");
+show_debug_message(moveSpeed);
 
-
-if (inputLeft)
-{
-    moveDir = -1;
-}
-
-hSpeed = moveDir * moveSpeed;
+show_debug_message("speed: ");
+show_debug_message(hSpeed);
 
 if(move)
 {
-    image_xscale = -moveDir;
+    image_xscale = -inputDirectional;
 }
 
 if (!move)
@@ -124,6 +215,7 @@ if (place_meeting(x, y + 1, obj_solid))
 }
 else
 {
+    jumpInput = false;
     if (vSpeed &lt; 10)
     {
         vSpeed += grav;
@@ -175,6 +267,7 @@ y += vSpeed;
 if (attackInput &amp;&amp; !attacking)
 {
     attacking = true;
+    attackInput = false;
     with( instance_create(x, y, obj_hero_attacking))
     {
         image_xscale = other.image_xscale;
@@ -228,6 +321,129 @@ if (attacking &amp;&amp; sprite_index != spr_hero_attack)
     sprite_index = spr_hero_attack 
     {image_speed = 0.1};
 }
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Change direction
+
+if (place_meeting(x + hSpeed, y, obj_Hero_Turn_point))
+{
+    inputDirectional *= -1;
+    show_debug_message("colidiu");
+    show_debug_message(inputDirectional);
+}
+
+
+
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>425</id>
+        <kind>4</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>0</useapplyto>
+        <exetype>0</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Swipe handling
+
+//This will set the init variables to be the first position on the screen that is touched.
+//In addition, set the isTouching variable to one, indicating that the screen is being touched.
+if (mouse_check_button_pressed(mb_left))
+{
+    initX = mouse_x;
+    initY = mouse_y;
+    isTouching = 1;
+}
+
+//Once the user stops touching the screen...
+if (mouse_check_button_released(mb_left))
+{
+    isTouching = 0;
+
+    var swipeLength = point_distance(initX, initY, mouse_x, mouse_y);
+    
+    if (swipeLength &gt;= swipeMinLength)
+    {
+        direction = point_direction(initX, initY, mouse_x, mouse_y);
+        scr_process_swipe_input(); 
+    }else
+    {
+        attackInput = true;   
+    }
+    
+    show_debug_message(swipeLength);
+}
+
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="8" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Draw swipe
+
+draw_self();
+
+if (isTouching)
+    draw_line(initX, initY, finalX, finalY);
 </string>
           </argument>
         </arguments>
